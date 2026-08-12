@@ -24,7 +24,6 @@ class Organization(models.Model):
     autopay_amount_to_purchase_cents = models.IntegerField(default=5000)
     autopay_charge_task_enqueued_at = models.DateTimeField(null=True, blank=True)
     autopay_charge_failure_data = models.JSONField(null=True, blank=True)
-    autopay_stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
 
     def autopay_amount_to_purchase_dollars(self):
         return self.autopay_amount_to_purchase_cents / 100
@@ -39,7 +38,7 @@ class Organization(models.Model):
         return self.centicredits / 100
 
     def has_working_autopay(self):
-        return self.autopay_enabled and bool(self.autopay_stripe_customer_id) and self.autopay_charge_failure_data is None
+        return self.autopay_enabled and self.autopay_charge_failure_data is None
 
     def out_of_credits(self):
         # If organization has working autopay grant them additional leeway

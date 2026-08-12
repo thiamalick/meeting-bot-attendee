@@ -274,7 +274,7 @@ class Command(BaseCommand):
         """
         Run autopay tasks for organizations that meet all criteria:
         - Autopay is enabled
-        - Has a Stripe customer ID
+
         - Credit balance is below the threshold
         - No autopay task has been enqueued in the last day
         """
@@ -285,8 +285,6 @@ class Command(BaseCommand):
         organizations = Organization.objects.filter(
             # Autopay must be enabled
             autopay_enabled=True,
-            # Must have a Stripe customer ID
-            autopay_stripe_customer_id__isnull=False,
             # Credit balance must be below threshold
             centicredits__lt=models.F("autopay_threshold_centricredits"),
             # No charge failure

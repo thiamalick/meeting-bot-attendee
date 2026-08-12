@@ -363,7 +363,7 @@ if os.getenv("ENABLE_CSP", "false") == "true":
             "connect-src": ["'self'", "https://cdn.jsdelivr.net"],
             "frame-src": ["https://www.loom.com"],
             "base-uri": ["'self'"],
-            "form-action": ["'self'", "https://*.stripe.com"],
+            "form-action": ["'self'"],
         },
     }
 

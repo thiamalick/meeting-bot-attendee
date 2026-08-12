@@ -1236,7 +1236,6 @@ class CreditTransaction(models.Model):
     centicredits_delta = models.IntegerField(null=False)
     parent_transaction = models.ForeignKey("self", on_delete=models.PROTECT, null=True, related_name="child_transactions")
     bot = models.ForeignKey(Bot, on_delete=models.PROTECT, null=True, related_name="credit_transactions")
-    stripe_payment_intent_id = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -1244,7 +1243,6 @@ class CreditTransaction(models.Model):
             models.UniqueConstraint(fields=["parent_transaction"], name="unique_child_transaction", condition=models.Q(parent_transaction__isnull=False)),
             models.UniqueConstraint(fields=["organization"], name="unique_root_transaction", condition=models.Q(parent_transaction__isnull=True)),
             models.UniqueConstraint(fields=["bot"], name="unique_bot_transaction", condition=models.Q(bot__isnull=False)),
-            models.UniqueConstraint(fields=["stripe_payment_intent_id"], name="unique_stripe_payment_intent_id", condition=models.Q(stripe_payment_intent_id__isnull=False)),
         ]
 
     def __str__(self):
@@ -1262,7 +1260,7 @@ class CreditTransaction(models.Model):
 
 class CreditTransactionManager:
     @classmethod
-    def create_transaction(cls, organization: Organization, centicredits_delta: int, bot: Bot = None, stripe_payment_intent_id: str = None, description: str = None) -> CreditTransaction:
+    def create_transaction(cls, organization: Organization, centicredits_delta: int, bot: Bot = None, description: str = None) -> CreditTransaction:
         """
         Creates a credit transaction for an organization. If no root transaction exists,
         creates one first. Otherwise creates a child transaction.
@@ -1299,7 +1297,6 @@ class CreditTransactionManager:
                         centicredits_delta=centicredits_delta,
                         parent_transaction=leaf_transaction,
                         bot=bot,
-                        stripe_payment_intent_id=stripe_payment_intent_id,
                         description=description,
                     )
 

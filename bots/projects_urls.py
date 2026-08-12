@@ -147,11 +147,6 @@ urlpatterns = [
         name="project-autopay",
     ),
     path(
-        "<str:object_id>/billing/autopay/stripe_portal/",
-        projects_views.ProjectAutopayStripePortalView.as_view(),
-        name="project-autopay-stripe-portal",
-    ),
-    path(
         "<str:object_id>/team/",
         projects_views.ProjectTeamView.as_view(),
         name="project-team",
