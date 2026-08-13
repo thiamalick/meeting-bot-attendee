@@ -9,11 +9,10 @@ import time
 import redis
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import connection, models, transaction
+from django.db import connection, transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from accounts.models import Organization
 from bots.models import Bot, BotStates, Calendar, CalendarStates, ZoomOAuthConnection, ZoomOAuthConnectionStates
 from bots.tasks.launch_scheduled_bot_task import launch_scheduled_bot
 from bots.tasks.refresh_zoom_oauth_connection_task import enqueue_refresh_zoom_oauth_connection_task
@@ -267,4 +266,3 @@ class Command(BaseCommand):
                 launch_scheduled_bot.delay(bot.id, bot.join_at.isoformat())
 
             log.info("Launched %s bots", len(bots_to_launch))
-

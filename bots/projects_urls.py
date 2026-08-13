@@ -126,7 +126,6 @@ urlpatterns = [
         projects_views.ProjectUsageView.as_view(),
         name="project-usage",
     ),
-
     path(
         "<str:object_id>/team/",
         projects_views.ProjectTeamView.as_view(),

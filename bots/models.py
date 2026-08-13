@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import Storage, storages
 from django.db import models, transaction
 from django.db.models import F, Q
-from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
@@ -947,21 +946,6 @@ class Bot(models.Model):
             seconds_active = 30
         return seconds_active
 
-    def centicredits_consumed(self) -> int:
-        if self.first_heartbeat_timestamp is None or self.last_heartbeat_timestamp is None:
-            return 0
-        if self.last_heartbeat_timestamp < self.first_heartbeat_timestamp:
-            return 0
-        seconds_active = self.last_heartbeat_timestamp - self.first_heartbeat_timestamp
-        # If first and last heartbeat are the same, we don't know the exact time the bot was active
-        # and that will make a difference to the charge. So we'll assume it ran for 30 seconds
-        if self.last_heartbeat_timestamp == self.first_heartbeat_timestamp:
-            seconds_active = 30
-        hours_active = seconds_active / 3600
-        # The rate is 1 credit per hour
-        centicredits_active = hours_active * 100
-        return math.ceil(centicredits_active)
-
     def cpu_request(self):
         from bots.meeting_url_utils import meeting_type_from_url
 
@@ -1800,17 +1784,6 @@ class BotEventManager:
                 if "transcription_errors" not in additional_event_metadata:
                     additional_event_metadata["transcription_errors"] = []
                 additional_event_metadata["transcription_errors"].extend(failed_transcription_recording.transcription_failure_data["failure_reasons"])
-
-        if settings.CHARGE_CREDITS_FOR_BOTS and cls.bot_event_type_should_incur_charges(event_type):
-            centicredits_consumed = bot.centicredits_consumed()
-            if centicredits_consumed > 0:
-                CreditTransactionManager.create_transaction(
-                    organization=bot.project.organization,
-                    centicredits_delta=-centicredits_consumed,
-                    bot=bot,
-                    description=f"For bot {bot.object_id}",
-                )
-                additional_event_metadata["credits_consumed"] = centicredits_consumed / 100
 
         return additional_event_metadata
 
