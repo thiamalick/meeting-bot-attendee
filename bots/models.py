@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import Storage, storages
 from django.db import models, transaction
 from django.db.models import F, Q
-from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
@@ -947,21 +946,6 @@ class Bot(models.Model):
             seconds_active = 30
         return seconds_active
 
-    def centicredits_consumed(self) -> int:
-        if self.first_heartbeat_timestamp is None or self.last_heartbeat_timestamp is None:
-            return 0
-        if self.last_heartbeat_timestamp < self.first_heartbeat_timestamp:
-            return 0
-        seconds_active = self.last_heartbeat_timestamp - self.first_heartbeat_timestamp
-        # If first and last heartbeat are the same, we don't know the exact time the bot was active
-        # and that will make a difference to the charge. So we'll assume it ran for 30 seconds
-        if self.last_heartbeat_timestamp == self.first_heartbeat_timestamp:
-            seconds_active = 30
-        hours_active = seconds_active / 3600
-        # The rate is 1 credit per hour
-        centicredits_active = hours_active * 100
-        return math.ceil(centicredits_active)
-
     def cpu_request(self):
         from bots.meeting_url_utils import meeting_type_from_url
 
@@ -1226,94 +1210,6 @@ class Bot(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["project", "deduplication_key"], name="unique_bot_deduplication_key", condition=~models.Q(state__in=BotStates.post_meeting_states())),
         ]
-
-
-class CreditTransaction(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False, related_name="credit_transactions")
-    created_at = models.DateTimeField(auto_now_add=True)
-    centicredits_before = models.IntegerField(null=False)
-    centicredits_after = models.IntegerField(null=False)
-    centicredits_delta = models.IntegerField(null=False)
-    parent_transaction = models.ForeignKey("self", on_delete=models.PROTECT, null=True, related_name="child_transactions")
-    bot = models.ForeignKey(Bot, on_delete=models.PROTECT, null=True, related_name="credit_transactions")
-    stripe_payment_intent_id = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["parent_transaction"], name="unique_child_transaction", condition=models.Q(parent_transaction__isnull=False)),
-            models.UniqueConstraint(fields=["organization"], name="unique_root_transaction", condition=models.Q(parent_transaction__isnull=True)),
-            models.UniqueConstraint(fields=["bot"], name="unique_bot_transaction", condition=models.Q(bot__isnull=False)),
-            models.UniqueConstraint(fields=["stripe_payment_intent_id"], name="unique_stripe_payment_intent_id", condition=models.Q(stripe_payment_intent_id__isnull=False)),
-        ]
-
-    def __str__(self):
-        return f"{self.organization.name} - {self.centicredits_delta}"
-
-    def credits_delta(self):
-        return self.centicredits_delta / 100
-
-    def credits_after(self):
-        return self.centicredits_after / 100
-
-    def credits_before(self):
-        return self.centicredits_before / 100
-
-
-class CreditTransactionManager:
-    @classmethod
-    def create_transaction(cls, organization: Organization, centicredits_delta: int, bot: Bot = None, stripe_payment_intent_id: str = None, description: str = None) -> CreditTransaction:
-        """
-        Creates a credit transaction for an organization. If no root transaction exists,
-        creates one first. Otherwise creates a child transaction.
-
-        Args:
-            organization: The Organization instance
-            centicredits_delta: The change in credits (positive for additions, negative for deductions)
-
-        Returns:
-            CreditTransaction instance
-
-        Raises:
-            RuntimeError: If max retries exceeded
-        """
-        max_retries = 10
-        retry_count = 0
-
-        while retry_count < max_retries:
-            try:
-                with transaction.atomic():
-                    # Refresh org state from DB
-                    organization.refresh_from_db()
-
-                    # Calculate new credit balance
-                    new_balance = organization.centicredits + centicredits_delta
-
-                    # Find the leaf transaction (one with no child transactions)
-                    leaf_transaction = CreditTransaction.objects.filter(organization=organization, child_transactions__isnull=True).first()
-
-                    credit_transaction = CreditTransaction.objects.create(
-                        organization=organization,
-                        centicredits_before=organization.centicredits,
-                        centicredits_after=new_balance,
-                        centicredits_delta=centicredits_delta,
-                        parent_transaction=leaf_transaction,
-                        bot=bot,
-                        stripe_payment_intent_id=stripe_payment_intent_id,
-                        description=description,
-                    )
-
-                    # Update organization's credit balance
-                    organization.centicredits = new_balance
-                    organization.save()
-
-                    return credit_transaction
-
-            except IntegrityError:
-                retry_count += 1
-                if retry_count >= max_retries:
-                    raise RuntimeError("Max retries exceeded while attempting to create credit transaction")
-                continue
 
 
 class BotEventTypes(models.IntegerChoices):
@@ -1888,17 +1784,6 @@ class BotEventManager:
                 if "transcription_errors" not in additional_event_metadata:
                     additional_event_metadata["transcription_errors"] = []
                 additional_event_metadata["transcription_errors"].extend(failed_transcription_recording.transcription_failure_data["failure_reasons"])
-
-        if settings.CHARGE_CREDITS_FOR_BOTS and cls.bot_event_type_should_incur_charges(event_type):
-            centicredits_consumed = bot.centicredits_consumed()
-            if centicredits_consumed > 0:
-                CreditTransactionManager.create_transaction(
-                    organization=bot.project.organization,
-                    centicredits_delta=-centicredits_consumed,
-                    bot=bot,
-                    description=f"For bot {bot.object_id}",
-                )
-                additional_event_metadata["credits_consumed"] = centicredits_consumed / 100
 
         return additional_event_metadata
 

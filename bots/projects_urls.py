@@ -127,31 +127,6 @@ urlpatterns = [
         name="project-usage",
     ),
     path(
-        "<str:object_id>/billing/",
-        projects_views.ProjectBillingView.as_view(),
-        name="project-billing",
-    ),
-    path(
-        "<str:object_id>/billing/checkout/",
-        projects_views.CreateCheckoutSessionView.as_view(),
-        name="create-checkout-session",
-    ),
-    path(
-        "<str:object_id>/billing/checkout/success/",
-        projects_views.CheckoutSuccessView.as_view(),
-        name="checkout-success",
-    ),
-    path(
-        "<str:object_id>/billing/autopay/",
-        projects_views.ProjectAutopayView.as_view(),
-        name="project-autopay",
-    ),
-    path(
-        "<str:object_id>/billing/autopay/stripe_portal/",
-        projects_views.ProjectAutopayStripePortalView.as_view(),
-        name="project-autopay-stripe-portal",
-    ),
-    path(
         "<str:object_id>/team/",
         projects_views.ProjectTeamView.as_view(),
         name="project-team",

@@ -321,7 +321,6 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 if os.getenv("USE_IRSA_FOR_S3_STORAGE", "false") == "true":
     AWS_S3_ADDRESSING_STYLE = "virtual"
 
-CHARGE_CREDITS_FOR_BOTS = os.getenv("CHARGE_CREDITS_FOR_BOTS", "false") == "true"
 
 BOT_POD_NAMESPACE = os.getenv("BOT_POD_NAMESPACE", "attendee")
 WEBPAGE_STREAMER_POD_NAMESPACE = os.getenv("WEBPAGE_STREAMER_POD_NAMESPACE", "attendee-webpage-streamer")
@@ -363,7 +362,7 @@ if os.getenv("ENABLE_CSP", "false") == "true":
             "connect-src": ["'self'", "https://cdn.jsdelivr.net"],
             "frame-src": ["https://www.loom.com"],
             "base-uri": ["'self'"],
-            "form-action": ["'self'", "https://*.stripe.com"],
+            "form-action": ["'self'"],
         },
     }
 

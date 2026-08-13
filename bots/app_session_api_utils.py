@@ -24,11 +24,6 @@ logger = logging.getLogger(__name__)
 
 
 def create_app_session(data: dict, source: BotCreationSource, project: Project) -> tuple[Bot | None, dict | None]:
-    # Given them a small grace period before we start rejecting requests
-    if project.organization.out_of_credits():
-        logger.error(f"Organization {project.organization.id} has insufficient credits. Please add credits in the Account -> Billing page.")
-        return None, {"error": "Organization has run out of credits. Please add more credits in the Account -> Billing page."}
-
     serializer = CreateAppSessionSerializer(data=data)
     if not serializer.is_valid():
         return None, serializer.errors

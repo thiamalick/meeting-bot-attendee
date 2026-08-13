@@ -186,17 +186,7 @@
                                 onclick="setActiveLink(this)">
                                     <i class="bi bi-people"></i> Team
                                 </a>
-                                {% if charge_credits_for_bots_setting %}
-                                <a class="nav-link ps-4"
-                                hx-get="{% url 'projects:project-billing' project.object_id %}"
-                                hx-select="#content"
-                                hx-target="#content"
-                                hx-swap="outerHTML"
-                                hx-push-url="true"
-                                onclick="setActiveLink(this)">
-                                    <i class="bi bi-credit-card"></i> Billing
-                                </a>
-                                {% endif %}
+
                                 <a class="nav-link ps-4" 
                                 hx-get="{% url 'projects:project-usage' project.object_id %}" 
                                 hx-select="#content"
@@ -227,11 +217,7 @@
 
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10 py-3">
-            {% if project.organization.credits < 0 %}
-            <div class="alert alert-danger mb-3" role="alert">
-                <strong>Your account has a negative credit balance.</strong> Please <a href="{% url 'projects:project-billing' project.object_id %}" class="alert-link">top up your credits</a> to continue creating bots.
-            </div>
-            {% endif %}
+
             <div id="content">
                 {% block content %}
                 {% endblock %}

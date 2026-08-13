@@ -11,41 +11,14 @@ class Organization(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # These represent hundredths of a credit
-    centicredits = models.IntegerField(default=500, null=False)
     version = IntegerVersionField()
     is_webhooks_enabled = models.BooleanField(default=True)
     is_async_transcription_enabled = models.BooleanField(default=False)
     is_managed_zoom_oauth_enabled = models.BooleanField(default=True)
     is_app_sessions_enabled = models.BooleanField(default=False)
 
-    autopay_enabled = models.BooleanField(default=False)
-    autopay_threshold_centricredits = models.IntegerField(default=1000)
-    autopay_amount_to_purchase_cents = models.IntegerField(default=5000)
-    autopay_charge_task_enqueued_at = models.DateTimeField(null=True, blank=True)
-    autopay_charge_failure_data = models.JSONField(null=True, blank=True)
-    autopay_stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
-
-    def autopay_amount_to_purchase_dollars(self):
-        return self.autopay_amount_to_purchase_cents / 100
-
-    def autopay_threshold_credits(self):
-        return self.autopay_threshold_centricredits / 100
-
     def __str__(self):
         return self.name
-
-    def credits(self):
-        return self.centicredits / 100
-
-    def has_working_autopay(self):
-        return self.autopay_enabled and bool(self.autopay_stripe_customer_id) and self.autopay_charge_failure_data is None
-
-    def out_of_credits(self):
-        # If organization has working autopay grant them additional leeway
-        if self.has_working_autopay():
-            return self.credits() < -25
-        return self.credits() < -1
 
 
 class UserRole(models.TextChoices):
