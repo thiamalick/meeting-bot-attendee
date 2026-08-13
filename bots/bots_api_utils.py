@@ -203,11 +203,6 @@ class BotCreationSource(str, Enum):
 
 
 def create_bot(data: dict, source: BotCreationSource, project: Project) -> tuple[Bot | None, dict | None]:
-    # Given them a small grace period before we start rejecting requests
-    if project.organization.out_of_credits():
-        logger.error(f"Organization {project.organization.id} has insufficient credits. Please add credits in the Account -> Billing page.")
-        return None, {"error": "Organization has run out of credits. Please add more credits in the Account -> Billing page."}
-
     # Do some initialization of the data if the calendar event id was provided
     calendar_event, error = initialize_bot_creation_data_from_calendar_event(data, project)
     if error:
