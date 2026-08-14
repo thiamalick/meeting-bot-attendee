@@ -210,7 +210,6 @@ class ProjectUrlContextMixin:
     def get_project_context(self, object_id, project):
         return {
             "project": project,
-            "charge_credits_for_bots_setting": settings.CHARGE_CREDITS_FOR_BOTS,
             "user_projects": Project.accessible_to(self.request.user),
             "UserRole": UserRole,
             "debug_mode": True if settings.DEBUG else False,
