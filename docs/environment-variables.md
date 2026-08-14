@@ -6,7 +6,7 @@ This document lists all supported environment variables for the Attendee applica
 
 1. [Core Application](#core-application)
 2. [Database](#database)
-3. [Storage (MinIO/S3/Azure)](#storage-minios3azure)
+3. [Storage (MinIO/Azure)](#storage-minioazure)
 4. [Email](#email)
 5. [Authentication & Security](#authentication--security)
 6. [Redis & Celery](#redis--celery)
@@ -39,13 +39,13 @@ This document lists all supported environment variables for the Attendee applica
 
 ---
 
-## Storage (MinIO/S3/Azure)
+## Storage (MinIO/Azure)
 
 ### Storage Protocol Selection
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `STORAGE_PROTOCOL` | String | `minio` | Storage backend to use: `minio` (S3-compatible, default), `s3` (AWS S3), or `azure` (Azure Blob Storage). |
+| `STORAGE_PROTOCOL` | String | `minio` | Storage backend to use: `minio` (S3-compatible, default) or `azure` (Azure Blob Storage). |
 
 ### MinIO Configuration (default)
 
@@ -56,19 +56,6 @@ This document lists all supported environment variables for the Attendee applica
 | `MINIO_SECRET_KEY` | String | **Required** | MinIO secret key for authentication. |
 | `MINIO_RECORDING_STORAGE_BUCKET_NAME` | String | **Required** | MinIO bucket name for storing meeting recordings. |
 | `MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME` | String | (Uses recording bucket) | MinIO bucket name for storing audio chunks. Falls back to `MINIO_RECORDING_STORAGE_BUCKET_NAME` if not set. |
-
-> **Note:** MinIO env vars take precedence. If not set, the system falls back to the AWS env vars below for backward compatibility.
-
-### AWS S3 Configuration (optional, fallback)
-
-| Variable | Type | Default | Description |
-|----------|------|---------|-------------|
-| `AWS_ACCESS_KEY_ID` | String | (None) | AWS IAM access key ID for S3 authentication. Used as fallback if `MINIO_ACCESS_KEY` is not set. |
-| `AWS_SECRET_ACCESS_KEY` | String | (None) | AWS IAM secret access key for S3 authentication. Used as fallback if `MINIO_SECRET_KEY` is not set. |
-| `AWS_ENDPOINT_URL` | String | (None) | Custom S3-compatible endpoint URL. Used as fallback if `MINIO_ENDPOINT_URL` is not set. |
-| `AWS_RECORDING_STORAGE_BUCKET_NAME` | String | (None) | S3 bucket name for storing meeting recordings. Used as fallback if `MINIO_RECORDING_STORAGE_BUCKET_NAME` is not set. |
-| `AWS_AUDIO_CHUNK_STORAGE_BUCKET_NAME` | String | (Uses recording bucket) | S3 bucket name for storing audio chunks. Falls back to `AWS_RECORDING_STORAGE_BUCKET_NAME` if not set. |
-| `USE_IRSA_FOR_S3_STORAGE` | Boolean | `false` | Use IRSA (IAM Roles for Service Accounts) for S3 authentication in EKS. Set to `true` when running on Kubernetes with IRSA. |
 
 ### Azure Blob Storage Configuration
 

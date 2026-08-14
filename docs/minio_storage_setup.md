@@ -4,7 +4,7 @@ This guide explains how to configure Attendee to use MinIO for object storage.
 
 ## Overview
 
-MinIO is an open-source, S3-compatible object storage server. Attendee now supports MinIO as a storage backend alongside AWS S3 and Azure Blob Storage.
+MinIO is an open-source, S3-compatible object storage server. Attendee uses MinIO as its default storage backend.
 
 ## Configuration
 
@@ -12,7 +12,7 @@ To use MinIO as your storage backend, you need to set the following environment 
 
 ### Required Variables
 
-1. **STORAGE_PROTOCOL**: Set to `"minio"` to enable MinIO storage
+1. **STORAGE_PROTOCOL**: Set to `"minio"` (this is the default)
    ```bash
    export STORAGE_PROTOCOL=minio
    ```
@@ -22,12 +22,12 @@ To use MinIO as your storage backend, you need to set the following environment 
    export MINIO_ENDPOINT_URL=http://minio-server:9000
    ```
 
-3. **MINIO_ACCESS_KEY**: Your MinIO access key (similar to AWS_ACCESS_KEY_ID)
+3. **MINIO_ACCESS_KEY**: Your MinIO access key
    ```bash
    export MINIO_ACCESS_KEY=your-minio-access-key
    ```
 
-4. **MINIO_SECRET_KEY**: Your MinIO secret key (similar to AWS_SECRET_ACCESS_KEY)
+4. **MINIO_SECRET_KEY**: Your MinIO secret key
    ```bash
    export MINIO_SECRET_KEY=your-minio-secret-key
    ```
@@ -44,16 +44,6 @@ To use MinIO as your storage backend, you need to set the following environment 
    export MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME=attendee-audio-chunks
    ```
 
-## Fallback to AWS Variables
-
-If you don't set the MinIO-specific variables, the system will fall back to AWS variables:
-- `MINIO_ENDPOINT_URL` falls back to `AWS_ENDPOINT_URL`
-- `MINIO_ACCESS_KEY` falls back to `AWS_ACCESS_KEY_ID`
-- `MINIO_SECRET_KEY` falls back to `AWS_SECRET_ACCESS_KEY`
-- `MINIO_RECORDING_STORAGE_BUCKET_NAME` falls back to `AWS_RECORDING_STORAGE_BUCKET_NAME`
-
-This allows for easy migration from AWS S3 to MinIO.
-
 ## Example Docker Compose Configuration
 
 Here's an example of how to configure MinIO with Docker Compose:
@@ -63,17 +53,21 @@ version: '3.8'
 
 services:
   minio:
-    image: minio/minio
-    container_name: minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"   # API S3
+      - "9001:9001"   # Console web
     environment:
       MINIO_ROOT_USER: your-access-key
       MINIO_ROOT_PASSWORD: your-secret-key
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   attendee:
     image: attendee
@@ -98,6 +92,8 @@ Before starting Attendee, make sure to create the required buckets in MinIO:
 1. Connect to your MinIO server (usually at `http://<minio-server>:9001` for the console)
 2. Create the buckets specified in your environment variables
 3. Ensure the access key and secret key have proper permissions
+
+You can also use the `minio-init` service in the Docker Compose stack to create the bucket automatically on first run.
 
 ## SSL/TLS Configuration
 
@@ -133,7 +129,7 @@ If using HTTPS with self-signed certificates:
 ```bash
 export MINIO_ENDPOINT_URL=https://minio-server:9000
 # You may need to disable SSL verification (not recommended for production)
-export AWS_S3_VERIFY_SSL=False  # This also affects MinIO
+export S3_VERIFY_SSL=False
 ```
 
 ### Bucket Permission Issues
@@ -144,19 +140,8 @@ Ensure your MinIO credentials have the following permissions:
 - `s3:GetObject`
 - `s3:DeleteObject`
 
-## Migration from AWS S3
-
-To migrate from AWS S3 to MinIO:
-
-1. Set up your MinIO server
-2. Create the required buckets
-3. Update your environment variables to use MinIO
-4. Restart Attendee
-
-The system will automatically use MinIO for new uploads. Existing files in S3 will remain accessible if you keep the AWS credentials configured.
-
 ## Notes
 
-- MinIO is fully S3-compatible, so all existing S3 features in Attendee work with MinIO
-- Presigned URLs work the same way with MinIO as they do with AWS S3
+- MinIO is fully S3-compatible, so all S3 features in Attendee work with MinIO
+- Presigned URLs work the same way with MinIO as they do with S3
 - The storage configuration supports both path-style and virtual-host-style addressing

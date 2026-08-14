@@ -1489,7 +1489,7 @@ class TestGoogleMeetBot2(TransactionTestCase):
 
         # Create external media storage credentials
         external_credentials = Credentials.objects.create(project=self.project, credential_type=Credentials.CredentialTypes.EXTERNAL_MEDIA_STORAGE)
-        external_credentials.set_credentials({"access_key_id": "test_access_key", "access_key_secret": "test_secret_key", "endpoint_url": "https://s3.amazonaws.com", "region_name": "us-east-1"})
+        external_credentials.set_credentials({"access_key_id": "test_access_key", "access_key_secret": "test_secret_key", "endpoint_url": "http://minio:9000", "region_name": "us-east-1"})
 
         # Configure the mock uploader for both regular and external storage
         mock_azure_uploader = create_mock_file_uploader()
@@ -1563,7 +1563,7 @@ class TestGoogleMeetBot2(TransactionTestCase):
         external_call_kwargs = external_call_args.kwargs
         self.assertEqual(external_call_kwargs["bucket"], "my-external-bucket")
         self.assertEqual(external_call_kwargs["filename"], "custom-recording-name.mp4")
-        self.assertEqual(external_call_kwargs["endpoint_url"], "https://s3.amazonaws.com")
+        self.assertEqual(external_call_kwargs["endpoint_url"], "http://minio:9000")
         self.assertEqual(external_call_kwargs["region_name"], "us-east-1")
         self.assertEqual(external_call_kwargs["access_key_id"], "test_access_key")
         self.assertEqual(external_call_kwargs["access_key_secret"], "test_secret_key")

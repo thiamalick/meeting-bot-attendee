@@ -1810,7 +1810,7 @@ class TranscriptUtteranceSerializer(serializers.Serializer):
         OpenApiExample(
             "Recording Upload",
             value={
-                "url": "https://attendee-short-term-storage-production.s3.amazonaws.com/e4da3b7fbbce2345d7772b0674a318d5.mp4?...",
+                "url": "https://minio.local:9000/attendee-recordings/e4da3b7fbbce2345d7772b0674a318d5.mp4?...",
                 "start_timestamp_ms": 1733114771000,
             },
         )
