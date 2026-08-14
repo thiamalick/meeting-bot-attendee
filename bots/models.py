@@ -1329,7 +1329,6 @@ class BotEventSubTypes(models.IntegerChoices):
     LEAVE_REQUESTED_AUTO_LEAVE_MAX_UPTIME_EXCEEDED = 17, "Leave requested - Auto leave max uptime exceeded"
     COULD_NOT_JOIN_MEETING_LOGIN_REQUIRED = 18, "Bot could not join meeting - Login required. Use signed in bots: https://docs.attendee.dev/guides/signed-in-bots to resolve."
     COULD_NOT_JOIN_MEETING_BOT_LOGIN_ATTEMPT_FAILED = 19, "Bot could not join meeting - Bot login attempt failed"
-    FATAL_ERROR_OUT_OF_CREDITS = 20, "Fatal error - Out of credits"
     COULD_NOT_JOIN_UNABLE_TO_CONNECT_TO_MEETING = 21, "Bot could not join meeting - Unable to connect to meeting. This usually means the meeting password in the URL is incorrect."
     FATAL_ERROR_ATTENDEE_INTERNAL_ERROR = 22, "Fatal error - Attendee internal error"
     BOT_RECORDING_PERMISSION_DENIED_HOST_DENIED_PERMISSION = 23, "Bot recording permission denied - Host denied permission"
@@ -1365,7 +1364,6 @@ class BotEventSubTypes(models.IntegerChoices):
             cls.LEAVE_REQUESTED_AUTO_LEAVE_MAX_UPTIME_EXCEEDED: "auto_leave_max_uptime_exceeded",
             cls.COULD_NOT_JOIN_MEETING_LOGIN_REQUIRED: "login_required",
             cls.COULD_NOT_JOIN_MEETING_BOT_LOGIN_ATTEMPT_FAILED: "bot_login_attempt_failed",
-            cls.FATAL_ERROR_OUT_OF_CREDITS: "out_of_credits",
             cls.COULD_NOT_JOIN_UNABLE_TO_CONNECT_TO_MEETING: "unable_to_connect_to_meeting",
             cls.FATAL_ERROR_ATTENDEE_INTERNAL_ERROR: "attendee_internal_error",
             cls.BOT_RECORDING_PERMISSION_DENIED_HOST_DENIED_PERMISSION: "host_denied_permission",
@@ -1417,7 +1415,7 @@ class BotEvent(models.Model):
             models.CheckConstraint(
                 condition=(
                     # For FATAL_ERROR event type, must have one of the valid event subtypes
-                    (Q(event_type=BotEventTypes.FATAL_ERROR) & (Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_PROCESS_TERMINATED) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_ATTENDEE_INTERNAL_ERROR) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_OUT_OF_CREDITS) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_RTMP_CONNECTION_FAILED) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_UI_ELEMENT_NOT_FOUND) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_HEARTBEAT_TIMEOUT) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_GLOBAL_RUNTIME_TIMEOUT) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_BOT_NOT_LAUNCHED)))
+                    (Q(event_type=BotEventTypes.FATAL_ERROR) & (Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_PROCESS_TERMINATED) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_ATTENDEE_INTERNAL_ERROR) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_RTMP_CONNECTION_FAILED) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_UI_ELEMENT_NOT_FOUND) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_HEARTBEAT_TIMEOUT) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_GLOBAL_RUNTIME_TIMEOUT) | Q(event_sub_type=BotEventSubTypes.FATAL_ERROR_BOT_NOT_LAUNCHED)))
                     |
                     # For COULD_NOT_JOIN event type, must have one of the valid event subtypes
                     (
