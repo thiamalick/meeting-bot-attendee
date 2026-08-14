@@ -13,7 +13,7 @@ Thank you for your interest in contributing to Attendee! This document provides 
    # Create local environment variables
    docker compose -f dev.docker-compose.yaml run --rm attendee-app-local python init_env.py > .env
    
-   # Edit .env and add your AWS credentials
+   # Edit .env and add your MinIO credentials (a MinIO server is already included in the Docker Compose stack)
    
    # Start all services
    docker compose -f dev.docker-compose.yaml up

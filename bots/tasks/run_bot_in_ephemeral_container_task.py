@@ -49,7 +49,7 @@ def run_bot_in_ephemeral_container(self, bot_id: int):
         image = os.getenv("BOT_CONTAINER_IMAGE", "attendee-attendee-worker-local:latest")
 
         # Copy all environment variables from worker to container
-        # This ensures all env vars (DB, Redis, AWS, Deepgram, etc.) are automatically passed
+        # This ensures all env vars (DB, Redis, MinIO, Deepgram, etc.) are automatically passed
         env_vars = os.environ.copy()
 
         # Remove Docker-specific or worker-specific vars that shouldn't be in the bot container
