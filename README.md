@@ -110,7 +110,7 @@ For more details, follow [this guide](https://developers.zoom.us/docs/meeting-sd
 - Create local environment variables
   - **Linux/Mac**: `docker compose -f dev.docker-compose.yaml run --rm attendee-app-local python init_env.py > .env`
   - **Windows**: `docker compose -f dev.docker-compose.yaml run --rm attendee-app-local python init_env.py | Out-File -Encoding utf8 .env` 
-- Edit the `.env` file and enter your AWS information.
+- Edit the `.env` file and enter your MinIO information (a MinIO server is already included in the Docker Compose stack).
 - Start all the services: `docker compose -f dev.docker-compose.yaml up`
 - After the services have started, run migrations in a separate terminal tab: `docker compose -f dev.docker-compose.yaml exec attendee-app-local python manage.py migrate`
 - Goto localhost:8000 in your browser and create an account

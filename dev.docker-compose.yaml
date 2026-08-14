@@ -10,6 +10,11 @@ services:
       - REDIS_URL=redis://redis:6379/5
       - DJANGO_SETTINGS_MODULE=attendee.settings.development
       - ENABLE_CHROME_SANDBOX=false
+      - STORAGE_PROTOCOL=minio
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_RECORDING_STORAGE_BUCKET_NAME=attendee-recordings
     command: "celery -A attendee worker -l INFO"
 
   attendee-scheduler-local:
@@ -22,6 +27,11 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://redis:6379/5
       - DJANGO_SETTINGS_MODULE=attendee.settings.development
+      - STORAGE_PROTOCOL=minio
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_RECORDING_STORAGE_BUCKET_NAME=attendee-recordings
     command: "python manage.py run_scheduler"
     entrypoint: []
 
@@ -37,6 +47,11 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://redis:6379/5
       - DJANGO_SETTINGS_MODULE=attendee.settings.development
+      - STORAGE_PROTOCOL=minio
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_RECORDING_STORAGE_BUCKET_NAME=attendee-recordings
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: []
 
@@ -51,6 +66,11 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=attendee.settings.development
       - ENABLE_CHROME_SANDBOX=true
+      - STORAGE_PROTOCOL=minio
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_RECORDING_STORAGE_BUCKET_NAME=attendee-recordings
     command: "python bots/webpage_streamer/run_webpage_streamer.py"
     security_opt:
       - seccomp=./bots/web_bot_adapter/chrome_seccomp.json
@@ -80,6 +100,39 @@ services:
     volumes:
       - redis:/data/redis
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - attendee_network
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (mc alias set local http://minio:9000 minioadmin minioadmin123) do sleep 1; done;
+      mc mb -p local/attendee-recordings;
+      mc anonymous set none local/attendee-recordings;
+      exit 0;
+      "
+    networks:
+      - attendee_network
+
 networks:
   attendee_network:
     driver: bridge
@@ -87,3 +140,4 @@ networks:
 volumes:
   postgres:
   redis:
+  minio_data:
