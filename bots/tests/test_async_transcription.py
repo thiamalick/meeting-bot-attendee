@@ -41,7 +41,7 @@ from bots.tasks.process_utterance_group_for_async_transcription_task import proc
 from bots.transcription_utils import split_transcription_by_utterance
 
 
-@mock.patch.dict(os.environ, {"AWS_RECORDING_STORAGE_BUCKET_NAME": "test-bucket", "CHARGE_CREDITS_FOR_BOTS": "false"})
+@mock.patch.dict(os.environ, {"MINIO_RECORDING_STORAGE_BUCKET_NAME": "test-bucket"})
 class AsyncTranscriptionTestCase(TransactionTestCase):
     """Base test case with common setup for Assembly AI async transcription tests."""
 

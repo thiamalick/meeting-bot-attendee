@@ -248,19 +248,16 @@ LOG_FORMATTERS = {
 }
 
 # Set up django storage backend
-# Use s3 by default, but if the STORAGE_PROTOCOL env var is set to "azure", use azure storage
-# or if set to "minio", use minio storage (S3-compatible)
-STORAGE_PROTOCOL = os.getenv("STORAGE_PROTOCOL", "s3")
-AWS_RECORDING_STORAGE_BUCKET_NAME = os.getenv("AWS_RECORDING_STORAGE_BUCKET_NAME")
+# STORAGE_PROTOCOL controls the backend: "minio" (default, S3-compatible), "s3" (S3), or "azure" (Azure Blob Storage)
+STORAGE_PROTOCOL = os.getenv("STORAGE_PROTOCOL", "minio")
+RECORDING_STORAGE_BUCKET_NAME = os.getenv("MINIO_RECORDING_STORAGE_BUCKET_NAME")
 AZURE_RECORDING_STORAGE_CONTAINER_NAME = os.getenv("AZURE_RECORDING_STORAGE_CONTAINER_NAME")
-MINIO_RECORDING_STORAGE_BUCKET_NAME = os.getenv("MINIO_RECORDING_STORAGE_BUCKET_NAME")
 
 # Audio chunk storage settings
 USE_REMOTE_STORAGE_FOR_AUDIO_CHUNKS = os.getenv("USE_REMOTE_STORAGE_FOR_AUDIO_CHUNKS", "false") == "true"
 FALLBACK_TO_DB_STORAGE_FOR_AUDIO_CHUNKS_IF_REMOTE_STORAGE_FAILS = os.getenv("FALLBACK_TO_DB_STORAGE_FOR_AUDIO_CHUNKS_IF_REMOTE_STORAGE_FAILS", "false") == "true"
-AWS_AUDIO_CHUNK_STORAGE_BUCKET_NAME = os.getenv("AWS_AUDIO_CHUNK_STORAGE_BUCKET_NAME") or AWS_RECORDING_STORAGE_BUCKET_NAME
+AUDIO_CHUNK_STORAGE_BUCKET_NAME = os.getenv("MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME") or RECORDING_STORAGE_BUCKET_NAME
 AZURE_AUDIO_CHUNK_STORAGE_CONTAINER_NAME = os.getenv("AZURE_AUDIO_CHUNK_STORAGE_CONTAINER_NAME") or AZURE_RECORDING_STORAGE_CONTAINER_NAME
-MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME = os.getenv("MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME") or MINIO_RECORDING_STORAGE_BUCKET_NAME
 
 if STORAGE_PROTOCOL == "azure":
     DEFAULT_STORAGE_BACKEND = {
@@ -282,30 +279,18 @@ else:
     DEFAULT_STORAGE_BACKEND = {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "endpoint_url": os.getenv("AWS_ENDPOINT_URL"),
-            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "endpoint_url": os.getenv("MINIO_ENDPOINT_URL"),
+            "access_key": os.getenv("MINIO_ACCESS_KEY"),
+            "secret_key": os.getenv("MINIO_SECRET_KEY"),
         },
     }
 
-    # For MinIO specifically, override endpoint_url if MINIO_ENDPOINT_URL is set
-    if STORAGE_PROTOCOL == "minio":
-        DEFAULT_STORAGE_BACKEND["OPTIONS"]["endpoint_url"] = os.getenv("MINIO_ENDPOINT_URL", os.getenv("AWS_ENDPOINT_URL"))
-        DEFAULT_STORAGE_BACKEND["OPTIONS"]["access_key"] = os.getenv("MINIO_ACCESS_KEY", os.getenv("AWS_ACCESS_KEY_ID"))
-        DEFAULT_STORAGE_BACKEND["OPTIONS"]["secret_key"] = os.getenv("MINIO_SECRET_KEY", os.getenv("AWS_SECRET_ACCESS_KEY"))
-
     # Deep copy the DEFAULT_STORAGE_BACKEND
     RECORDING_STORAGE_BACKEND = copy.deepcopy(DEFAULT_STORAGE_BACKEND)
-    if STORAGE_PROTOCOL == "minio":
-        RECORDING_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = MINIO_RECORDING_STORAGE_BUCKET_NAME
-    else:
-        RECORDING_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = AWS_RECORDING_STORAGE_BUCKET_NAME
+    RECORDING_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = RECORDING_STORAGE_BUCKET_NAME
 
     AUDIO_CHUNK_STORAGE_BACKEND = copy.deepcopy(DEFAULT_STORAGE_BACKEND)
-    if STORAGE_PROTOCOL == "minio":
-        AUDIO_CHUNK_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = MINIO_AUDIO_CHUNK_STORAGE_BUCKET_NAME
-    else:
-        AUDIO_CHUNK_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = AWS_AUDIO_CHUNK_STORAGE_BUCKET_NAME
+    AUDIO_CHUNK_STORAGE_BACKEND["OPTIONS"]["bucket_name"] = AUDIO_CHUNK_STORAGE_BUCKET_NAME
 
 
 STORAGES = {
@@ -317,9 +302,9 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-AWS_S3_SIGNATURE_VERSION = "s3v4"
+S3_SIGNATURE_VERSION = "s3v4"
 if os.getenv("USE_IRSA_FOR_S3_STORAGE", "false") == "true":
-    AWS_S3_ADDRESSING_STYLE = "virtual"
+    S3_ADDRESSING_STYLE = "virtual"
 
 
 BOT_POD_NAMESPACE = os.getenv("BOT_POD_NAMESPACE", "attendee")

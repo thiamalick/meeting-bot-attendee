@@ -24,6 +24,6 @@ You may need to rebuild the docker image. You can do this in one of two ways:
 
 ## Application emits errors when uploading files when running locally. 
 
-This may happen if the AWS_REGION is not set correctly. It currently defaults to `us-east-1`.  
-You can set this in the .env file.
+This may happen if the MinIO configuration is incorrect. Make sure the MinIO server is running and the `MINIO_ENDPOINT_URL`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, and `MINIO_RECORDING_STORAGE_BUCKET_NAME` are set correctly in the `.env` file.  
+If you're using the Docker Compose stack, a MinIO server is already included and the bucket is created automatically on first run.
 

@@ -37,7 +37,7 @@ class TestBotDeletion(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.settings_override = override_settings(AWS_RECORDING_STORAGE_BUCKET_NAME="test-bucket")
+        cls.settings_override = override_settings(RECORDING_STORAGE_BUCKET_NAME="test-bucket")
         cls.settings_override.enable()
 
     def setUp(self):

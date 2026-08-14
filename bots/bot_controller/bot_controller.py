@@ -630,7 +630,7 @@ class BotController:
             )
 
         return S3FileUploader(
-            bucket=settings.AWS_RECORDING_STORAGE_BUCKET_NAME,
+            bucket=settings.RECORDING_STORAGE_BUCKET_NAME,
             filename=self.get_recording_filename(),
             endpoint_url=settings.RECORDING_STORAGE_BACKEND.get("OPTIONS").get("endpoint_url"),
         )
