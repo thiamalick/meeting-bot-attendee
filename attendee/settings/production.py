@@ -4,7 +4,7 @@ import sys
 import dj_database_url
 
 from .base import *
-from .base import LOG_FORMATTERS
+from .base import DEFAULT_FROM_EMAIL, LOG_FORMATTERS
 
 DEBUG = False
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
@@ -41,14 +41,9 @@ else:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 
+# The SMTP server itself is configured in base.py from the EMAIL_* env vars
 if os.getenv("DISABLE_EMAIL", "false") != "true":
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.mailgun.org")
-    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@mail.attendee.dev")
 
 ADMINS = []
 
@@ -60,7 +55,7 @@ if os.getenv("ERROR_REPORTS_RECEIVER_EMAIL_ADDRESS"):
         )
     )
 
-SERVER_EMAIL = os.getenv("SERVER_EMAIL", "noreply@mail.attendee.dev")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
 

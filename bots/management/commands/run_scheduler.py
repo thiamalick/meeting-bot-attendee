@@ -13,7 +13,7 @@ from django.db import connection, transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from bots.models import Bot, BotStates, Calendar, CalendarStates, ZoomOAuthConnection, ZoomOAuthConnectionStates
+from bots.models import Bot, BotStates, Calendar, CalendarPlatform, CalendarStates, ZoomOAuthConnection, ZoomOAuthConnectionStates
 from bots.tasks.launch_scheduled_bot_task import launch_scheduled_bot
 from bots.tasks.refresh_zoom_oauth_connection_task import enqueue_refresh_zoom_oauth_connection_task
 from bots.tasks.sync_calendar_task import enqueue_sync_calendar_task
@@ -138,6 +138,7 @@ class Command(BaseCommand):
         # Find connected calendars that haven't had a sync task enqueued in the last 24 hours
         calendars = Calendar.objects.filter(
             state=CalendarStates.CONNECTED,
+            platform__in=CalendarPlatform.syncable_platforms(),
         ).filter(Q(sync_task_enqueued_at__isnull=True) | Q(sync_task_enqueued_at__lte=cutoff_time) | Q(sync_task_requested_at__isnull=False))
 
         for calendar in calendars:

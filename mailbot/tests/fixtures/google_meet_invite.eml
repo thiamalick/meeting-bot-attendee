@@ -1,0 +1,95 @@
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com [209.85.220.41])
+	by mx.client.fr (Stalwart) with ESMTPS id 4F2A1C0B3D
+	for <bot@client.fr>; Fri, 09 Oct 2026 08:12:31 +0000
+Authentication-Results: $AUTH_RESULTS
+From: Alice Martin <$SENDER>
+To: bot@client.fr
+Subject: Invitation: Point projet
+Message-ID: <$MESSAGE_ID>
+Date: Fri, 09 Oct 2026 08:12:30 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="000000000000mixed"
+$EXTRA_HEADERS
+--000000000000mixed
+Content-Type: multipart/alternative; boundary="000000000000alt"
+
+--000000000000alt
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+
+Point projet
+Rejoindre avec Google Meet
+https://meet.google.com/abc-defg-hij
+
+Invitation de Google Agenda: https://calendar.google.com/calendar/
+
+--000000000000alt
+Content-Type: text/calendar; charset="UTF-8"; method=$METHOD
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:$METHOD
+BEGIN:VEVENT
+DTSTART:$START_UTC
+DTEND:$END_UTC
+DTSTAMP:20261009T081230Z
+ORGANIZER;CN=Alice Martin:mailto:alice@client.fr
+UID:$UID
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Alice Martin;X-NUM-GUESTS=0:mailto:alice@client.fr
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=bot@client.fr;X-NUM-GUESTS=0:mailto:bot@client.fr
+X-GOOGLE-CONFERENCE:https://meet.google.com/abc-defg-hij
+CREATED:20261009T081200Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nRejoindre avec Google Meet : https://meet.google.c
+ om/abc-defg-hij\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20261009T081230Z
+LOCATION:
+SEQUENCE:$SEQUENCE
+STATUS:$STATUS
+SUMMARY:Point projet
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000alt--
+--000000000000mixed
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:$METHOD
+BEGIN:VEVENT
+DTSTART:$START_UTC
+DTEND:$END_UTC
+DTSTAMP:20261009T081230Z
+ORGANIZER;CN=Alice Martin:mailto:alice@client.fr
+UID:$UID
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Alice Martin;X-NUM-GUESTS=0:mailto:alice@client.fr
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=bot@client.fr;X-NUM-GUESTS=0:mailto:bot@client.fr
+X-GOOGLE-CONFERENCE:https://meet.google.com/abc-defg-hij
+CREATED:20261009T081200Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nRejoindre avec Google Meet : https://meet.google.c
+ om/abc-defg-hij\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20261009T081230Z
+LOCATION:
+SEQUENCE:$SEQUENCE
+STATUS:$STATUS
+SUMMARY:Point projet
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000mixed--

@@ -1,0 +1,12 @@
+{% autoescape off %}Bonjour,
+{% if general %}
+{{ general }}
+{% endif %}{% for item in items %}
+• {{ item.summary }}{% if item.start %} — {{ item.start }}{% endif %}
+  {{ item.text }}
+{% endfor %}
+{{ how_to }}
+
+{{ bot_name }}
+Ce message a été envoyé automatiquement.
+{% endautoescape %}

@@ -2053,7 +2053,7 @@ class CreateCalendarSerializer(serializers.Serializer):
     client_id = serializers.CharField(help_text="The client ID for the calendar platform authentication")
     client_secret = serializers.CharField(help_text="The client secret for the calendar platform authentication")
     refresh_token = serializers.CharField(help_text="The refresh token for accessing the calendar platform")
-    platform = serializers.ChoiceField(choices=CalendarPlatform.choices, help_text="The calendar platform (google or microsoft)")
+    platform = serializers.ChoiceField(choices=[(platform.value, platform.label) for platform in CalendarPlatform.syncable_platforms()], help_text="The calendar platform (google or microsoft)")
     metadata = serializers.JSONField(help_text="JSON object containing metadata to associate with the calendar", required=False, default=None)
     deduplication_key = serializers.CharField(help_text="Optional key for deduplicating calendars. If a calendar with this key already exists in the project, the new calendar will not be created and an error will be returned.", required=False, default=None)
 

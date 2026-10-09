@@ -60,7 +60,7 @@ sqlparse==0.5.1
 trio==0.28.0
 trio-websocket==0.11.1
 typing_extensions==4.13.2
-tzdata==2024.2
+tzdata==2026.5
 uritemplate==4.1.1
 urllib3==2.7.0
 vine==5.1.0
@@ -105,3 +105,5 @@ django-csp==4.0
 pyotp==2.9.0
 Cython==3.2.4
 gdown==6.0.0
+icalendar==7.3.0
+

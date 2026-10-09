@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import copy
+import json
 import os
 from pathlib import Path
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "accounts",
     "bots",
+    "mailbot",
     "rest_framework",
     "concurrency",
     "allauth.socialaccount.providers.google",
@@ -69,7 +71,15 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = "/"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Outgoing email. Without EMAIL_HOST emails are only printed to the console
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST else "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true") == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false") == "true"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
@@ -353,6 +363,39 @@ if os.getenv("ENABLE_CSP", "false") == "true":
             "form-action": ["'self'"],
         },
     }
+
+# Mailbot: meeting invitations emailed to the bot address schedule bots automatically (see docs/mailbot.md)
+MAILBOT_ENABLED = os.getenv("MAILBOT_ENABLED", "false") == "true"
+MAILBOT_ADDRESS = os.getenv("MAILBOT_ADDRESS", "").strip().lower()
+# object_id of the project the bots are created in
+MAILBOT_PROJECT_ID = os.getenv("MAILBOT_PROJECT_ID")
+MAILBOT_IMAP_HOST = os.getenv("MAILBOT_IMAP_HOST")
+MAILBOT_IMAP_PORT = int(os.getenv("MAILBOT_IMAP_PORT", "993"))
+# "ssl" (implicit TLS), "starttls" or "none" (local development only)
+MAILBOT_IMAP_SECURITY = os.getenv("MAILBOT_IMAP_SECURITY", "ssl")
+MAILBOT_IMAP_USER = os.getenv("MAILBOT_IMAP_USER")
+MAILBOT_IMAP_PASSWORD = os.getenv("MAILBOT_IMAP_PASSWORD")
+MAILBOT_IMAP_FOLDER = os.getenv("MAILBOT_IMAP_FOLDER", "INBOX")
+MAILBOT_IMAP_PROCESSED_FOLDER = os.getenv("MAILBOT_IMAP_PROCESSED_FOLDER", "Processed")
+MAILBOT_POLL_INTERVAL_SECONDS = int(os.getenv("MAILBOT_POLL_INTERVAL_SECONDS", "30"))
+MAILBOT_HEARTBEAT_FILE = os.getenv("MAILBOT_HEARTBEAT_FILE")
+# Bearer token for POST /mailbot/inbound, the endpoint is disabled when unset
+MAILBOT_HTTP_INGEST_TOKEN = os.getenv("MAILBOT_HTTP_INGEST_TOKEN")
+# Comma separated, e.g. "client.fr,filiale.client.fr". Subdomains are not implicitly allowed
+MAILBOT_ALLOWED_SENDER_DOMAINS = [d.strip().lower() for d in os.getenv("MAILBOT_ALLOWED_SENDER_DOMAINS", "").split(",") if d.strip()]
+# Require dmarc=pass in an Authentication-Results header written by MAILBOT_TRUSTED_AUTHSERV_ID, so the sender can't be spoofed
+MAILBOT_REQUIRE_DMARC = os.getenv("MAILBOT_REQUIRE_DMARC", "true") == "true"
+MAILBOT_TRUSTED_AUTHSERV_ID = os.getenv("MAILBOT_TRUSTED_AUTHSERV_ID", "").strip().lower()
+MAILBOT_MAX_EMAIL_SIZE_BYTES = int(os.getenv("MAILBOT_MAX_EMAIL_SIZE_BYTES", str(10 * 1024 * 1024)))
+MAILBOT_MAX_EMAILS_PER_SENDER_PER_HOUR = int(os.getenv("MAILBOT_MAX_EMAILS_PER_SENDER_PER_HOUR", "60"))
+MAILBOT_BOT_NAME = os.getenv("MAILBOT_BOT_NAME", "Meeting Bot")
+# JSON merged into every bot creation request, e.g. {"zoom_settings": {"sdk": "web"}}
+MAILBOT_BOT_SETTINGS = json.loads(os.getenv("MAILBOT_BOT_SETTINGS") or "{}")
+MAILBOT_SEND_REPLIES = os.getenv("MAILBOT_SEND_REPLIES", "true") == "true"
+# "fr" or "en"
+MAILBOT_REPLY_LANGUAGE = os.getenv("MAILBOT_REPLY_LANGUAGE", "fr")
+MAILBOT_RECURRENCE_HORIZON_DAYS = int(os.getenv("MAILBOT_RECURRENCE_HORIZON_DAYS", "14"))
+MAILBOT_RAW_RETENTION_DAYS = int(os.getenv("MAILBOT_RAW_RETENTION_DAYS", "30"))
 
 # Initialize Sentry (only if SENTRY_DSN is set)
 init_sentry()

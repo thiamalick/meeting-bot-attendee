@@ -147,6 +147,16 @@
                         <i class="bi bi-calendar3"></i> Calendars
                     </a>
 
+                    <a class="nav-link"
+                       hx-get="{% url 'mailbot:project-mailbot' project.object_id %}"
+                       hx-select="#content"
+                       hx-target="#content"
+                       hx-swap="outerHTML"
+                       hx-push-url="true"
+                       onclick="setActiveLink(this)">
+                        <i class="bi bi-envelope"></i> Mailbot
+                    </a>
+
                     {% if project.organization.is_app_sessions_enabled %}
                     <a class="nav-link" 
                        hx-get="{% url 'projects:project-app-sessions' project.object_id %}" 

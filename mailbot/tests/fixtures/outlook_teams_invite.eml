@@ -1,0 +1,89 @@
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2071.outbound.protection.outlook.com [40.107.22.71])
+	by mx.client.fr (Stalwart) with ESMTPS id 7C1D2E3F4A
+	for <bot@client.fr>; Fri, 09 Oct 2026 09:01:12 +0000
+Authentication-Results: $AUTH_RESULTS
+From: Bruno Leroy <$SENDER>
+To: Meeting Bot <bot@client.fr>
+Subject: Comité de pilotage
+Thread-Topic: Comité de pilotage
+Message-ID: <$MESSAGE_ID>
+Date: Fri, 9 Oct 2026 09:01:10 +0000
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="_000_PAXPR02MB7000outlook_"
+
+--_000_PAXPR02MB7000outlook_
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+________________________________________________________________________________
+Réunion Microsoft Teams
+Rejoindre sur votre ordinateur, application mobile ou appareil de salle
+Cliquez ici pour rejoindre la réunion<https://teams.microsoft.com/l/meetup-join/19%3ameeting_NjA2ZTk0YzQtYjM0Mi00ZWU2LTk2ZDEtMDM5MzU2ZWZlNzk2%40thread.v2/0?context=%7b%22Tid%22%3a%22a1b2c3d4-0000-4000-8000-000000000001%22%2c%22Oid%22%3a%22e5f6a7b8-0000-4000-8000-000000000002%22%7d>
+ID de la réunion : 312 845 990 123
+________________________________________________________________________________
+
+--_000_PAXPR02MB7000outlook_
+Content-Type: text/calendar; charset="utf-8"; method=REQUEST
+Content-Transfer-Encoding: 8bit
+
+BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:Romance Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T020000
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER;CN=Bruno Leroy:mailto:bruno.leroy@client.fr
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=Meeting Bot:mailto:bot@client.fr
+DESCRIPTION;LANGUAGE=fr-FR:____________________________________________________
+ ____________________________\nRéunion Microsoft Teams\nRejoindre sur votre
+  ordinateur\, application mobile ou appareil de salle\nCliquez ici pour rej
+ oindre la réunion<https://teams.microsoft.com/l/meetup-join/19%3ameeting_NjA
+ 2ZTk0YzQtYjM0Mi00ZWU2LTk2ZDEtMDM5MzU2ZWZlNzk2%40thread.v2/0?context=%7b%22Ti
+ d%22%3a%22a1b2c3d4-0000-4000-8000-000000000001%22%2c%22Oid%22%3a%22e5f6a7b8-
+ 0000-4000-8000-000000000002%22%7d>\nID de la réunion : 312 845 990 123\n
+UID:$UID
+SUMMARY;LANGUAGE=fr-FR:Comité de pilotage
+DTSTART;TZID=Romance Standard Time:$START_LOCAL
+DTEND;TZID=Romance Standard Time:$END_LOCAL
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20261009T090110Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:$SEQUENCE
+LOCATION;LANGUAGE=fr-FR:Réunion Microsoft Teams
+X-MICROSOFT-CDO-APPT-SEQUENCE:$SEQUENCE
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_NjA2ZTk0YzQtYjM0Mi00ZWU2LTk2ZDEtMDM5MzU2ZWZlNzk2%40thread.v2/0?
+ context=%7b%22Tid%22%3a%22a1b2c3d4-0000-4000-8000-000000000001%22%2c%22Oid%2
+ 2%3a%22e5f6a7b8-0000-4000-8000-000000000002%22%7d
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+BEGIN:VALARM
+DESCRIPTION:REMINDER
+TRIGGER;RELATED=START:-PT15M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+
+--_000_PAXPR02MB7000outlook_--
