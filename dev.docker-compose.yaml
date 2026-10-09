@@ -88,6 +88,46 @@ services:
       - webpage-streamer
 
 
+  # Reads the bot mailbox, see docs/mailbot.md. Configure the MAILBOT_* variables in .env first
+  attendee-mailbot-local:
+    build: ./
+    volumes:
+     - .:/attendee
+    networks:
+      - attendee_network
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_URL=redis://redis:6379/5
+      - DJANGO_SETTINGS_MODULE=attendee.settings.development
+      - STORAGE_PROTOCOL=minio
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_RECORDING_STORAGE_BUCKET_NAME=attendee-recordings
+    command: python manage.py run_mailbot
+    entrypoint: []
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+      mail:
+        condition: service_started
+    profiles:
+      - mail
+
+  # Development mail server (SMTP on 3025, IMAP on 3143). It accepts any login and creates the mailbox on the fly,
+  # and doesn't check SPF/DKIM/DMARC: use MAILBOT_REQUIRE_DMARC=false with it, never in production
+  mail:
+    image: greenmail/standalone:2.1.2
+    environment:
+      - GREENMAIL_OPTS=-Dgreenmail.setup.test.all -Dgreenmail.hostname=0.0.0.0 -Dgreenmail.auth.disabled -Dgreenmail.verbose
+    ports:
+      - "3025:3025"
+      - "3143:3143"
+    networks:
+      - attendee_network
+    profiles:
+      - mail
+
   postgres:
     image: postgres:15.3-alpine
     environment:

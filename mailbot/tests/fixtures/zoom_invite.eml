@@ -1,0 +1,36 @@
+Authentication-Results: $AUTH_RESULTS
+From: Chloe Durand <$SENDER>
+To: bot@client.fr
+Subject: Revue trimestrielle
+Message-ID: <$MESSAGE_ID>
+Date: Fri, 09 Oct 2026 10:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="zoomboundary"
+
+--zoomboundary
+Content-Type: text/plain; charset="UTF-8"
+
+Chloe Durand vous invite à une réunion Zoom planifiée.
+
+--zoomboundary
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST; name="meeting.ics"
+Content-Disposition: attachment; filename="meeting.ics"
+
+BEGIN:VCALENDAR
+PRODID:-//zoom.us//iCalendar Event//EN
+VERSION:2.0
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTAMP:20261009T100000Z
+DTSTART:$START_UTC
+DTEND:$END_UTC
+SUMMARY:Revue trimestrielle
+UID:$UID
+ORGANIZER;CN=Chloe Durand:mailto:chloe.durand@client.fr
+LOCATION:https://us05web.zoom.us/j/84315220467?pwd=9M1SQg2Pu2l0cB078uz6AHeWelSK19.1
+DESCRIPTION:Rejoindre la réunion Zoom\nhttps://us05web.zoom.us/j/84315220467?pwd=9M1SQg2Pu2l0cB078uz6AHeWelSK19.1
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR
+
+--zoomboundary--

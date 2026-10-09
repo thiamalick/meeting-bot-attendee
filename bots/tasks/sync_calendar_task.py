@@ -107,6 +107,9 @@ def sync_calendar(self, calendar_id):
     """Celery task to sync calendar events with a remote calendar."""
     logger.info(f"Syncing calendar {calendar_id}")
     calendar = Calendar.objects.get(id=calendar_id)
+    if calendar.platform == CalendarPlatform.EMAIL:
+        logger.info(f"Calendar {calendar_id} receives its events by email, nothing to sync")
+        return None
     if calendar.platform == CalendarPlatform.GOOGLE:
         sync_handler = GoogleCalendarSyncHandler(calendar_id)
     elif calendar.platform == CalendarPlatform.MICROSOFT:

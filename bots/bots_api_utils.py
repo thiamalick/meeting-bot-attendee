@@ -200,6 +200,7 @@ class BotCreationSource(str, Enum):
     API = "api"
     DASHBOARD = "dashboard"
     SCHEDULER = "scheduler"
+    EMAIL = "email"
 
 
 def create_bot(data: dict, source: BotCreationSource, project: Project) -> tuple[Bot | None, dict | None]:

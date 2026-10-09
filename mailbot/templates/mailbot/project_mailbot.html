@@ -1,0 +1,85 @@
+{% extends 'projects/sidebar.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mailbot</h2>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            {% if not mailbot_enabled %}
+                <p class="mb-0"><i class="bi bi-envelope-slash me-2"></i>The mailbot is disabled. Set <code>MAILBOT_ENABLED=true</code> to schedule bots from invitations sent by email.</p>
+            {% elif not mailbot_is_this_project %}
+                <p class="mb-0"><i class="bi bi-info-circle me-2"></i>The mailbot creates its bots in another project (<code>MAILBOT_PROJECT_ID</code>).</p>
+            {% else %}
+                <p>Invite <strong>{{ mailbot_address }}</strong> to a Zoom, Google Meet or Microsoft Teams meeting, or forward it the invitation: a bot is scheduled automatically and follows reschedules and cancellations.</p>
+                <p class="mb-0 text-muted">
+                    Allowed sender domains: {% for domain in allowed_sender_domains %}<code>{{ domain }}</code>{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-danger">none, every email is ignored</span>{% endfor %}
+                    · DMARC required: {{ require_dmarc|yesno:"yes,no" }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if inbound_emails %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Received</th>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>State</th>
+                    <th>Decision</th>
+                    <th>Bots</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inbound_email in inbound_emails %}
+                <tr>
+                    <td><small>{{ inbound_email.created_at|date:"M d, Y H:i" }}</small></td>
+                    <td><small>{{ inbound_email.sender|default:"-" }}</small></td>
+                    <td><small>{{ inbound_email.subject|truncatechars:60 }}</small></td>
+                    <td>
+                        <span class="badge {% if inbound_email.state == InboundEmailStates.PROCESSED %}bg-success{% elif inbound_email.state == InboundEmailStates.FAILED %}bg-danger{% elif inbound_email.state == InboundEmailStates.IGNORED %}bg-secondary{% else %}bg-info{% endif %}">
+                            {{ inbound_email.get_state_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <small>
+                            {% if inbound_email.outcome %}<code>{{ inbound_email.outcome }}</code>{% endif %}
+                            {{ inbound_email.decision_reason|truncatechars:200 }}
+                        </small>
+                    </td>
+                    <td>
+                        <small>
+                        {% for detail in inbound_email.details %}{% if detail.bot_id %}
+                            <a href="#"
+                               hx-get="{% url 'bots:project-bot-detail' object_id=project.object_id bot_object_id=detail.bot_id %}"
+                               hx-select="#content"
+                               hx-target="#content"
+                               hx-swap="outerHTML"
+                               hx-push-url="true">{{ detail.bot_id }}</a><br>
+                        {% endif %}{% endfor %}
+                        </small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="d-flex justify-content-between">
+        {% if page_obj.has_previous %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}">Newer</a>{% else %}<span></span>{% endif %}
+        {% if page_obj.has_next %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.next_page_number }}">Older</a>{% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>No email received yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

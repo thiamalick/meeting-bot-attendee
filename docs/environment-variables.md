@@ -15,6 +15,7 @@ This document lists all supported environment variables for the Attendee applica
 9. [Bot Configuration](#bot-configuration)
 10. [Logging](#logging)
 11. [Sentry (Error Tracking)](#sentry-error-tracking)
+12. [Mailbot](#mailbot)
 
 ---
 
@@ -83,12 +84,15 @@ This document lists all supported environment variables for the Attendee applica
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `DISABLE_EMAIL` | Boolean | `false` | Disable email sending. Set to `true` to use console backend for development. |
-| `EMAIL_HOST` | String | `smtp.mailgun.org` | SMTP server hostname. |
-| `EMAIL_HOST_USER` | String | **Required** (if email enabled) | SMTP username. |
-| `EMAIL_HOST_PASSWORD` | String | **Required** (if email enabled) | SMTP password. |
-| `DEFAULT_FROM_EMAIL` | String | `noreply@mail.attendee.dev` | Default sender email address for transactional emails. |
-| `SERVER_EMAIL` | String | `noreply@mail.attendee.dev` | Sender email for server error reports. |
+| `DISABLE_EMAIL` | Boolean | `false` | Production only: set to `true` to print emails to the console instead of sending them. |
+| `EMAIL_HOST` | String | (None) | SMTP server hostname. Without it, emails are only printed to the console (outside production). |
+| `EMAIL_PORT` | Integer | `587` | SMTP server port. |
+| `EMAIL_USE_TLS` | Boolean | `true` | Use STARTTLS. |
+| `EMAIL_USE_SSL` | Boolean | `false` | Use implicit TLS (usually port 465). Don't combine with `EMAIL_USE_TLS`. |
+| `EMAIL_HOST_USER` | String | (empty) | SMTP username. |
+| `EMAIL_HOST_PASSWORD` | String | (empty) | SMTP password. |
+| `DEFAULT_FROM_EMAIL` | String | `webmaster@localhost` | Default sender email address for transactional emails. |
+| `SERVER_EMAIL` | String | `DEFAULT_FROM_EMAIL` | Sender email for server error reports. |
 | `ERROR_REPORTS_RECEIVER_EMAIL_ADDRESS` | String | (None) | Email address to receive error reports. If not set, error emails are not sent. |
 
 ---
@@ -178,3 +182,36 @@ This document lists all supported environment variables for the Attendee applica
 | `SENTRY_TRACES_SAMPLE_RATE` | Float | `0.1` | Sample rate for performance tracing (0.0 to 1.0, where 1.0 means 100%). |
 | `SENTRY_PROFILES_SAMPLE_RATE` | Float | `0.1` | Sample rate for profiling data (0.0 to 1.0). |
 | `SENTRY_SEND_PII` | Boolean | `false` | Include personally identifiable information (PII) in Sentry reports. Set to `true` only for development. |
+
+---
+
+## Mailbot
+
+Schedules bots from meeting invitations emailed to the bot address. See [mailbot.md](mailbot.md).
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `MAILBOT_ENABLED` | Boolean | `false` | Enable the mailbot. |
+| `MAILBOT_ADDRESS` | String | **Required** | Address of the bot, e.g. `bot@client.fr`. Replies are sent from it. |
+| `MAILBOT_PROJECT_ID` | String | **Required** | `object_id` of the project the bots are created in (`proj_...`). |
+| `MAILBOT_IMAP_HOST` | String | **Required** | IMAP server of the bot mailbox. |
+| `MAILBOT_IMAP_PORT` | Integer | `993` | IMAP port. |
+| `MAILBOT_IMAP_SECURITY` | String | `ssl` | `ssl` (implicit TLS), `starttls`, or `none` (local development only). |
+| `MAILBOT_IMAP_USER` | String | **Required** | IMAP login. |
+| `MAILBOT_IMAP_PASSWORD` | String | **Required** | IMAP password or app password. |
+| `MAILBOT_IMAP_FOLDER` | String | `INBOX` | Folder read by the mailbot. |
+| `MAILBOT_IMAP_PROCESSED_FOLDER` | String | `Processed` | Folder messages are moved to once recorded. Created if missing. |
+| `MAILBOT_POLL_INTERVAL_SECONDS` | Integer | `30` | Delay between two mailbox reads. |
+| `MAILBOT_HEARTBEAT_FILE` | String | (None) | File rewritten after every successful poll, for a liveness probe. |
+| `MAILBOT_HTTP_INGEST_TOKEN` | String | (None) | Enables `POST /mailbot/inbound` for MTAs that push emails, with this bearer token. |
+| `MAILBOT_ALLOWED_SENDER_DOMAINS` | String | (empty: every email is ignored) | Comma separated domains allowed to schedule the bot. Subdomains must be listed explicitly. |
+| `MAILBOT_REQUIRE_DMARC` | Boolean | `true` | Require `dmarc=pass` from the trusted MTA so that senders can't be spoofed. |
+| `MAILBOT_TRUSTED_AUTHSERV_ID` | String | (None) | authserv-id of the `Authentication-Results` header written by your MTA, e.g. `mx.client.fr`. |
+| `MAILBOT_MAX_EMAIL_SIZE_BYTES` | Integer | `10485760` | Larger emails are recorded but not processed. |
+| `MAILBOT_MAX_EMAILS_PER_SENDER_PER_HOUR` | Integer | `60` | Emails beyond this rate are ignored. |
+| `MAILBOT_BOT_NAME` | String | `Meeting Bot` | Name of the bots in the meeting. |
+| `MAILBOT_BOT_SETTINGS` | JSON | `{}` | Merged into every bot creation request, e.g. `{"zoom_settings": {"sdk": "web"}, "recording_settings": {"format": "mp3"}}`. |
+| `MAILBOT_SEND_REPLIES` | Boolean | `true` | Answer the requester (confirmation or reason of the refusal). Unauthorized senders never get an answer. |
+| `MAILBOT_REPLY_LANGUAGE` | String | `fr` | `fr` or `en`. |
+| `MAILBOT_RECURRENCE_HORIZON_DAYS` | Integer | `14` | Bots are scheduled for the occurrences of recurring meetings within this many days, later ones are added automatically. |
+| `MAILBOT_RAW_RETENTION_DAYS` | Integer | `30` | Raw emails are deleted after this many days. Their audit record (sender, decision) is kept. |

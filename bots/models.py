@@ -421,6 +421,12 @@ class ZoomMeetingToZoomOAuthConnectionMapping(models.Model):
 class CalendarPlatform(models.TextChoices):
     GOOGLE = "google"
     MICROSOFT = "microsoft"
+    # Events come from invitations emailed to the bot (see the mailbot app), there is no remote calendar to sync
+    EMAIL = "email"
+
+    @classmethod
+    def syncable_platforms(cls):
+        return [cls.GOOGLE, cls.MICROSOFT]
 
 
 class CalendarStates(models.IntegerChoices):
